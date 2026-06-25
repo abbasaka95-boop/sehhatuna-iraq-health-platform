@@ -3,8 +3,7 @@ import { UserRole } from '../types';
 import { ShieldCheck, GraduationCap, Building2, Activity, Key, Mail, Eye, EyeOff, Sparkles, ArrowRight, ArrowLeft, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import Logo from './Logo';
-import { auth } from '../lib/firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '../lib/firebase';
 
 interface LoginPortalProps {
   onLoginSuccess: (role: UserRole, email: string) => void;

@@ -11,8 +11,7 @@ import {
   User, Plus, CheckCircle, Smartphone, Download, Sparkles, ChevronRight, Scale, Move
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { setDoc, doc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, doc, setDoc } from '../lib/firebase';
 
 interface StudentDashboardProps {
   students: Student[];

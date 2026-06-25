@@ -11,8 +11,7 @@ import {
   ArrowDownToLine, Trash2, Heart, Search, Megaphone, Calendar, FileText, CheckCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, doc, setDoc } from '../lib/firebase';
 
 interface SchoolDashboardProps {
   students: Student[];

@@ -9,8 +9,7 @@ import { Activity, ShieldAlert, Heart, Calendar, GraduationCap, Building2, Layou
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import Logo from './Logo';
-import { auth } from '../lib/firebase';
-import { signOut } from 'firebase/auth';
+
 
 interface NavbarProps {
   currentRole: UserRole;

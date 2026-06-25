@@ -13,8 +13,7 @@ import {
   MapPin, GraduationCap, Percent, Check, AlertTriangle, Eye, Settings, Building
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { doc, setDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, doc, setDoc, deleteDoc } from '../lib/firebase';
 
 interface UnifiedDashboardProps {
   students: Student[];

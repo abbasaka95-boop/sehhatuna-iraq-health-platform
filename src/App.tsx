@@ -24,9 +24,7 @@ import UnifiedDashboard from './components/UnifiedDashboard';
 import LoginPortal from './components/LoginPortal';
 import { motion, AnimatePresence } from 'motion/react';
 import { Heart, Activity, ShieldAlert, Sparkles, AlertCircle, Building, Users } from 'lucide-react';
-import { auth, db } from './lib/firebase';
-import { signOut } from 'firebase/auth';
-import { collection, onSnapshot, writeBatch, doc } from 'firebase/firestore';
+import { auth, db, signOut, collection, onSnapshot, writeBatch, doc } from './lib/firebase';
 
 export default function App() {
   // Secure authentication states
