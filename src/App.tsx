@@ -24,7 +24,7 @@ import UnifiedDashboard from './components/UnifiedDashboard';
 import LoginPortal from './components/LoginPortal';
 import { motion, AnimatePresence } from 'motion/react';
 import { Heart, Activity, ShieldAlert, Sparkles, AlertCircle, Building, Users } from 'lucide-react';
-import { auth, db, signOut, collection, onSnapshot, writeBatch, doc } from './lib/firebase';
+import { auth, db, signOut, collection, onSnapshot, writeBatch, doc, getDocs, query, limit } from './lib/firebase';
 
 export default function App() {
   // Secure authentication states
@@ -49,18 +49,24 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     const init = async () => {
-      // 1. Seed data FIRST (wait for it)
-      if (!localStorage.getItem('_db_students')) {
+      // 1. Check if Firestore already has data (skip seed if so)
+      let needsSeed = false;
+      try {
+        const check = await getDocs(query(collection(db, 'students'), limit(1)));
+        needsSeed = check.empty;
+      } catch { needsSeed = true; }
+
+      if (needsSeed) {
         try {
           const batch = writeBatch(db);
-          initialStudents.forEach(item => batch.set(doc(db, 'students', item.id), item));
-          initialAppointments.forEach(item => batch.set(doc(db, 'appointments', item.id), item));
-          initialReports.forEach(item => batch.set(doc(db, 'reports', item.id), item));
-          initialEmergencies.forEach(item => batch.set(doc(db, 'emergencies', item.id), item));
-          initialAnnouncements.forEach(item => batch.set(doc(db, 'announcements', item.id), item));
-          initialHospitals.forEach(item => batch.set(doc(db, 'hospitals', item.id), item));
-          initialSchools.forEach(item => batch.set(doc(db, 'schools', item.id), item));
-          initialUsers.forEach(item => batch.set(doc(db, 'users', item.id), item));
+          initialStudents.forEach(item => batch.set(doc(db, 'students', item.id), { ...item }));
+          initialAppointments.forEach(item => batch.set(doc(db, 'appointments', item.id), { ...item }));
+          initialReports.forEach(item => batch.set(doc(db, 'reports', item.id), { ...item }));
+          initialEmergencies.forEach(item => batch.set(doc(db, 'emergencies', item.id), { ...item }));
+          initialAnnouncements.forEach(item => batch.set(doc(db, 'announcements', item.id), { ...item }));
+          initialHospitals.forEach(item => batch.set(doc(db, 'hospitals', item.id), { ...item }));
+          initialSchools.forEach(item => batch.set(doc(db, 'schools', item.id), { ...item }));
+          initialUsers.forEach(item => batch.set(doc(db, 'users', item.id), { ...item }));
           await batch.commit();
         } catch (err) {
           console.error("Seeding error:", err);

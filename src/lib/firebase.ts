@@ -1,111 +1,67 @@
-// LOCAL STORAGE DATABASE ENGINE — replaces Firebase entirely
-// No accounts, no config, zero cost, works offline
+import { initializeApp } from 'firebase/app';
+import {
+  getFirestore,
+  doc as fbDoc,
+  collection as fbCollection,
+  setDoc as fbSetDoc,
+  updateDoc as fbUpdateDoc,
+  deleteDoc as fbDeleteDoc,
+  onSnapshot as fbOnSnapshot,
+  writeBatch as fbWriteBatch,
+  getDocs as fbGetDocs,
+  query as fbQuery,
+  where as fbWhere,
+  limit as fbLimit,
+} from 'firebase/firestore';
+import config from '../../firebase-applet-config.json';
 
-// ==================== Storage Layer ====================
-function getCol<T = any>(name: string): T[] {
-  try {
-    const raw = localStorage.getItem('_db_' + name);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
+const app = initializeApp(config);
+const firestore = getFirestore(app, '(default)');
 
-function saveCol(name: string, data: any[]): void {
-  localStorage.setItem('_db_' + name, JSON.stringify(data));
-}
-
-// ==================== Listener System ====================
-const colListeners: Record<string, Set<() => void>> = {};
-
-function notify(name: string) {
-  const set = colListeners[name];
-  if (set) set.forEach(fn => fn());
-}
-
-function subscribe(name: string, fn: () => void) {
-  if (!colListeners[name]) colListeners[name] = new Set();
-  colListeners[name].add(fn);
-  return () => { colListeners[name].delete(fn); };
-}
-
-// ==================== Mock Refs ====================
-class DocRef {
-  constructor(public _col: string, public _id: string) {}
-}
-class ColRef {
-  constructor(public _name: string) {}
-}
-
-// ==================== Public Exports ====================
-export const app = {};
 export const auth = { currentUser: null };
-export const db = {};
+export const db = firestore;
 
-// ==================== Firestore Functions ====================
 export function doc(_db: any, col: string, id: string) {
-  return new DocRef(col, id);
+  return fbDoc(_db, col, id);
 }
 
 export function collection(_db: any, name: string) {
-  return new ColRef(name);
+  return fbCollection(_db, name);
 }
 
-export async function setDoc(ref: DocRef, data: any, options?: { merge?: boolean }) {
-  const col = getCol(ref._col);
-  const idx = col.findIndex((item: any) => item.id === ref._id);
-  if (idx >= 0) {
-    col[idx] = options?.merge ? { ...col[idx], ...data } : { ...data, id: ref._id };
-  } else {
-    col.push({ ...data, id: ref._id });
-  }
-  saveCol(ref._col, col);
-  notify(ref._col);
+export async function setDoc(ref: any, data: any, options?: any) {
+  return fbSetDoc(ref, data, options);
 }
 
-export async function updateDoc(ref: DocRef, data: any) {
-  return setDoc(ref, data, { merge: true });
+export async function updateDoc(ref: any, data: any) {
+  return fbUpdateDoc(ref, data);
 }
 
-export async function deleteDoc(ref: DocRef) {
-  const col = getCol(ref._col);
-  saveCol(ref._col, col.filter((item: any) => item.id !== ref._id));
-  notify(ref._col);
+export async function deleteDoc(ref: any) {
+  return fbDeleteDoc(ref);
 }
 
-export function onSnapshot(colRef: ColRef, callback: Function, _error?: Function) {
-  const run = () => {
-    const data = getCol(colRef._name);
-    callback({
-      docs: data.map((item: any) => ({ id: item.id, data: () => item, exists: true })),
-      forEach: (fn: Function) => data.forEach((item: any) => fn({ id: item.id, data: () => item, exists: true })),
-    });
-  };
-  run();
-  return subscribe(colRef._name, run);
+export function onSnapshot(ref: any, onNext: (snap: any) => void, onError?: (e: any) => void) {
+  return fbOnSnapshot(
+    ref,
+    (snapshot: any) => {
+      onNext({
+        docs: snapshot.docs.map((d: any) => ({ id: d.id, data: () => ({ id: d.id, ...d.data() }), exists: d.exists })),
+        forEach: (fn: any) => snapshot.docs.forEach((d: any) => fn({ id: d.id, data: () => ({ id: d.id, ...d.data() }), exists: d.exists })),
+      });
+    },
+    onError,
+  );
 }
 
 export function writeBatch(_db: any) {
-  const ops: Array<{ col: string; id: string; data: any; merge?: boolean }> = [];
+  const batch = fbWriteBatch(_db);
   return {
-    set(ref: DocRef, data: any, opts?: { merge?: boolean }) {
-      ops.push({ col: ref._col, id: ref._id, data, merge: opts?.merge });
-    },
-    async commit() {
-      for (const op of ops) {
-        const col = getCol(op.col);
-        const idx = col.findIndex((item: any) => item.id === op.id);
-        if (idx >= 0) {
-          col[idx] = op.merge ? { ...col[idx], ...op.data } : { ...op.data, id: op.id };
-        } else {
-          col.push({ ...op.data, id: op.id });
-        }
-        saveCol(op.col, col);
-        notify(op.col);
-      }
-    },
+    set(ref: any, data: any, opts?: any) { batch.set(ref, data, opts); },
+    async commit() { await batch.commit(); },
   };
 }
 
-// ==================== Auth Mocks ====================
 export async function signInWithEmailAndPassword(_auth: any, _email: string, _password: string) {
   return { user: { email: _email, uid: _email.replace(/[^a-zA-Z0-9]/g, '_') } };
 }
@@ -115,3 +71,5 @@ export async function createUserWithEmailAndPassword(_auth: any, _email: string,
 }
 
 export async function signOut(_auth: any) {}
+
+export { fbGetDocs as getDocs, fbQuery as query, fbWhere as where, fbLimit as limit };

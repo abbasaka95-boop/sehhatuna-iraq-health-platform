@@ -3,7 +3,7 @@ import { UserRole } from '../types';
 import { ShieldCheck, GraduationCap, Building2, Activity, Key, Mail, Eye, EyeOff, Sparkles, ArrowRight, ArrowLeft, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import Logo from './Logo';
-import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '../lib/firebase';
+import { auth, signInWithEmailAndPassword, db, collection, getDocs, query, where } from '../lib/firebase';
 
 interface LoginPortalProps {
   onLoginSuccess: (role: UserRole, email: string) => void;
@@ -79,14 +79,12 @@ export default function LoginPortal({ onLoginSuccess, lang }: LoginPortalProps) 
       return;
     }
 
-    // Check localStorage users (created via admin panel)
+    // Check Firestore for custom users (created via admin panel)
     try {
-      const raw = localStorage.getItem('_db_users');
-      if (raw) {
-        const users = JSON.parse(raw);
-        const matched = users.find((u: any) => u.email === emailTrimmed && u.password === password);
-        if (matched) {
-          await signInWithEmailAndPassword(auth, emailTrimmed, password);
+      const userSnap = await getDocs(query(collection(db, 'users'), where('email', '==', emailTrimmed)));
+      if (!userSnap.empty) {
+        const matched = userSnap.docs[0].data();
+        if (matched.password && password === matched.password) {
           onLoginSuccess(matched.role || selectedRoleType, emailTrimmed);
           return;
         }
