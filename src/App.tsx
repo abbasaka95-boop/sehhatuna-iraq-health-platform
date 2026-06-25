@@ -143,6 +143,8 @@ export default function App() {
       <Navbar 
         currentRole={currentRole} 
         setCurrentRole={setCurrentRole} 
+        entityNameAr={schools.find(s => s.email === userEmail)?.nameAr || hospitals.find(h => h.email === userEmail)?.nameAr}
+        entityNameEn={schools.find(s => s.email === userEmail)?.nameEn || hospitals.find(h => h.email === userEmail)?.nameEn}
         lang={lang} 
         setLang={setLang}
         activeSosCount={activeSosCount}
@@ -268,6 +270,7 @@ export default function App() {
                   setEmergencies={setEmergencies}
                   hospitals={hospitals}
                   setHospitals={setHospitals}
+                  userEmail={userEmail}
                   lang={lang}
                 />
               )}
@@ -278,6 +281,8 @@ export default function App() {
                   setStudents={setStudents}
                   announcements={announcements}
                   setAnnouncements={setAnnouncements}
+                  schools={schools}
+                  userEmail={userEmail}
                   lang={lang}
                 />
               )}

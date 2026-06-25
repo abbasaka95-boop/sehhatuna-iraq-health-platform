@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Student, Appointment, HealthReport, EmergencyAlert, HospitalEntity } from '../types';
 import { translations, CURRENT_DATE_STRING } from '../data';
 import { 
@@ -25,6 +25,7 @@ interface HospitalDashboardProps {
   setEmergencies: React.Dispatch<React.SetStateAction<EmergencyAlert[]>>;
   hospitals?: HospitalEntity[];
   setHospitals?: React.Dispatch<React.SetStateAction<HospitalEntity[]>>;
+  userEmail: string;
   lang: 'ar' | 'en';
 }
 
@@ -39,9 +40,15 @@ export default function HospitalDashboard({
   setEmergencies,
   hospitals,
   setHospitals,
+  userEmail,
   lang,
 }: HospitalDashboardProps) {
   const t = translations[lang];
+
+  const currentHospital = useMemo(() =>
+    hospitals?.find(h => h.email === userEmail) || hospitals?.[0],
+    [hospitals, userEmail]
+  );
 
   // Report uploader form states
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
@@ -103,8 +110,8 @@ export default function HospitalDashboard({
       notesEn: notesEn || notesAr,
       doctorNameAr,
       doctorNameEn: doctorNameEn || doctorNameAr,
-      hospitalNameAr: 'مستشفى الموسوي الأهلي',
-      hospitalNameEn: 'Al-Moussawi Private Hospital',
+      hospitalNameAr: currentHospital?.nameAr || 'مستشفى',
+      hospitalNameEn: currentHospital?.nameEn || 'Hospital',
       attachmentName: `${reportType.replace(/\s+/g, '_').toLowerCase()}_report.pdf`
     };
 
@@ -165,7 +172,7 @@ export default function HospitalDashboard({
           </div>
           <div>
             <h2 className="text-xl md:text-2xl font-black tracking-tight text-white">
-              {lang === 'ar' ? 'عيادة مستشفى الموسوي الأهلي' : 'Al-Moussawi Private Hospital Clinic'}
+              {lang === 'ar' ? currentHospital?.nameAr || 'المستشفى' : currentHospital?.nameEn || 'Hospital'}
             </h2>
             <p className="text-xs text-slate-300 mt-1 font-semibold font-sans">
               {lang === 'ar' ? 'شريك الرعاية الطبية المعتمد لشبكة الصحة المدرسية في العراق' : 'Primary health care provider for School Health Network in Iraq'}

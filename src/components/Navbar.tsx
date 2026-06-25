@@ -21,6 +21,8 @@ interface NavbarProps {
   isLoggedIn: boolean;
   loggedInRole: UserRole | null;
   onLogout: () => void;
+  entityNameAr?: string;
+  entityNameEn?: string;
 }
 
 export default function Navbar({
@@ -33,6 +35,8 @@ export default function Navbar({
   isLoggedIn,
   loggedInRole,
   onLogout,
+  entityNameAr,
+  entityNameEn,
 }: NavbarProps) {
   const t = translations[lang];
   const [time, setTime] = useState<string>('');
@@ -112,12 +116,12 @@ export default function Navbar({
           {isLoggedIn && (
             <div className="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl text-emerald-950 font-extrabold text-xs" id="navbar-user-indicator">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <span>
-                {currentRole === 'admin' && (lang === 'ar' ? 'أدمن النظام' : 'Super Admin')}
-                {currentRole === 'school' && (lang === 'ar' ? 'مدرسة السياب' : 'Al-Sayyab School')}
-                {currentRole === 'hospital' && (lang === 'ar' ? 'مستشفى البصرة' : 'Basra Hospital')}
-                {currentRole === 'student' && (lang === 'ar' ? 'ولي الأمر والكل' : 'Guardian/Student')}
-              </span>
+                  <span>
+                    {currentRole === 'admin' && (lang === 'ar' ? 'أدمن النظام' : 'Super Admin')}
+                    {currentRole === 'school' && (lang === 'ar' ? entityNameAr || 'المدرسة' : entityNameEn || 'School')}
+                    {currentRole === 'hospital' && (lang === 'ar' ? entityNameAr || 'المستشفى' : entityNameEn || 'Hospital')}
+                    {currentRole === 'student' && (lang === 'ar' ? 'ولي الأمر' : 'Guardian')}
+                  </span>
             </div>
           )}
 

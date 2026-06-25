@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { Student, AnnouncementAlert } from '../types';
+import React, { useState, useMemo } from 'react';
+import { Student, AnnouncementAlert, SchoolEntity } from '../types';
 import { translations, CURRENT_DATE_STRING } from '../data';
 import { 
   Building2, Users, CheckCircle2, AlertOctagon, Percent, UserPlus,
@@ -18,6 +18,8 @@ interface SchoolDashboardProps {
   setStudents: React.Dispatch<React.SetStateAction<Student[]>>;
   announcements: AnnouncementAlert[];
   setAnnouncements: React.Dispatch<React.SetStateAction<AnnouncementAlert[]>>;
+  schools: SchoolEntity[];
+  userEmail: string;
   lang: 'ar' | 'en';
 }
 
@@ -26,9 +28,13 @@ export default function SchoolDashboard({
   setStudents,
   announcements,
   setAnnouncements,
+  schools,
+  userEmail,
   lang,
 }: SchoolDashboardProps) {
   const t = translations[lang];
+
+  const currentSchool = useMemo(() => schools.find(s => s.email === userEmail) || schools[0], [schools, userEmail]);
 
   // Search & filter states
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -60,15 +66,19 @@ export default function SchoolDashboard({
   const [annType, setAnnType] = useState<'vaccine' | 'campaign' | 'general'>('vaccine');
   const [annSuccess, setAnnSuccess] = useState<boolean>(false);
 
-  // Statistics
-  const totalCount = students.length;
+  // Statistics (filtered by current school)
+  const schoolStudents = useMemo(() =>
+    students.filter(s => s.schoolNameAr === currentSchool?.nameAr),
+    [students, currentSchool]
+  );
+  const totalCount = schoolStudents.length;
   // Subscribed students count (active, expiring, critical)
-  const subscribedCount = students.filter(s => s.subscriptionStatus !== 'expired').length;
-  const criticalCount = students.filter(s => s.status === 'emergency' || s.status === 'review').length;
+  const subscribedCount = schoolStudents.filter(s => s.subscriptionStatus !== 'expired').length;
+  const criticalCount = schoolStudents.filter(s => s.status === 'emergency' || s.status === 'review').length;
   const ratio = totalCount > 0 ? Math.round((subscribedCount / totalCount) * 100) : 0;
 
-  // Filtered Students
-  const filteredStudents = students.filter(s => {
+  // Filtered Students (by school + search)
+  const filteredStudents = schoolStudents.filter(s => {
     const matchesSearch = s.nameAr.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           s.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           s.nationalId.includes(searchQuery) ||
@@ -113,8 +123,8 @@ export default function SchoolDashboard({
       parentNameEn: parentNameEn || parentNameAr,
       parentPhone,
       nationalId,
-      schoolNameAr: 'مدرسة السياب الابتدائية',
-      schoolNameEn: 'Al-Sayyab Primary School',
+      schoolNameAr: currentSchool?.nameAr || 'مدرسة',
+      schoolNameEn: currentSchool?.nameEn || 'School',
       subscriptionPrice: 150000,
       subscriptionStatus: subStatus,
       subscriptionExpiry: expiry,
@@ -160,8 +170,8 @@ export default function SchoolDashboard({
       descriptionEn: annDescEn || annDescAr,
       type: annType,
       date: CURRENT_DATE_STRING,
-      schoolNameAr: 'مدرسة السياب الابتدائية',
-      schoolNameEn: 'Al-Sayyab Primary School'
+      schoolNameAr: currentSchool?.nameAr || 'مدرسة',
+      schoolNameEn: currentSchool?.nameEn || 'School'
     };
 
     try {
@@ -218,7 +228,7 @@ export default function SchoolDashboard({
           </div>
           <div>
             <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
-              {lang === 'ar' ? 'مدرسة السياب الابتدائية' : 'Al-Sayyab Primary School'}
+              {lang === 'ar' ? currentSchool?.nameAr || 'المدرسة' : currentSchool?.nameEn || 'School'}
             </h2>
             <p className="text-xs text-slate-300 mt-1 font-semibold font-sans">
               {lang === 'ar' ? 'المكتب الصحي للمدرسة • إدارة شؤون الطلبة الطبية' : 'School Health Office • Student Medical Affairs'}
