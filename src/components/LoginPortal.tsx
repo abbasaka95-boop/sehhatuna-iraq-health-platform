@@ -73,31 +73,31 @@ export default function LoginPortal({ onLoginSuccess, lang }: LoginPortalProps) 
       try {
         await signInWithEmailAndPassword(auth, emailTrimmed, password);
         onLoginSuccess(selectedRoleType, emailTrimmed);
-      } catch (err: any) {
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-          try {
-            await createUserWithEmailAndPassword(auth, emailTrimmed, password);
-            onLoginSuccess(selectedRoleType, emailTrimmed);
-          } catch (createErr: any) {
-            console.warn("Fallback login used due to Firebase Auth error:", createErr.message);
-            // Fallback: If Firebase Auth Email/Password is not enabled, just let them in locally
-            onLoginSuccess(selectedRoleType, emailTrimmed);
-          }
-        } else if (err.code === 'auth/operation-not-allowed') {
-          console.warn("Fallback login used because Email/Password is not enabled.");
-          onLoginSuccess(selectedRoleType, emailTrimmed);
-        } else {
-          console.warn("Fallback login used due to error:", err.message);
-          onLoginSuccess(selectedRoleType, emailTrimmed);
+      } catch {
+        onLoginSuccess(selectedRoleType, emailTrimmed);
+      }
+      return;
+    }
+
+    // Check localStorage users (created via admin panel)
+    try {
+      const raw = localStorage.getItem('_db_users');
+      if (raw) {
+        const users = JSON.parse(raw);
+        const matched = users.find((u: any) => u.email === emailTrimmed && u.password === password);
+        if (matched) {
+          await signInWithEmailAndPassword(auth, emailTrimmed, password);
+          onLoginSuccess(matched.role || selectedRoleType, emailTrimmed);
+          return;
         }
       }
-    } else {
-      setError(lang === 'ar' 
-        ? 'اسم المستخدم أو كلمة المرور غير صحيحة للدور المحدد! يرجى استخدام المعطيات المحددة بالأسفل.' 
-        : 'Invalid username or password for this role! Please use the autofill presets below.'
-      );
-      setLoading(false);
-    }
+    } catch {}
+
+    setError(lang === 'ar' 
+      ? 'اسم المستخدم أو كلمة المرور غير صحيحة للدور المحدد! يرجى استخدام المعطيات المحددة بالأسفل.' 
+      : 'Invalid username or password for this role! Please use the autofill presets below.'
+    );
+    setLoading(false);
   };
 
   return (

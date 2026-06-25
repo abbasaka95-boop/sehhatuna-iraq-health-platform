@@ -191,6 +191,7 @@ export default function UnifiedDashboard({
   const [showUserForm, setShowUserForm] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [uEmail, setUEmail] = useState('');
+  const [uPassword, setUPassword] = useState('');
   const [uRole, setURole] = useState<'hospital' | 'school' | 'student' | 'admin'>('student');
   const [uPermissions, setUPermissions] = useState<'read' | 'edit' | 'manage'>('read');
 
@@ -802,11 +803,12 @@ export default function UnifiedDashboard({
     if (!uEmail) return;
 
     if (editingUserId) {
-      const updated = {
+      const updated: Record<string, any> = {
         email: uEmail,
         role: uRole,
         permissions: uPermissions
       };
+      if (uPassword) updated.password = uPassword;
 
       try {
         await setDoc(doc(db, 'users', editingUserId), updated, { merge: true });
@@ -820,6 +822,7 @@ export default function UnifiedDashboard({
       const newUser: UserAccount = {
         id: `USR-${Math.floor(100 + Math.random() * 900)}`,
         email: uEmail,
+        password: uPassword || 'sehhati2026',
         role: uRole,
         permissions: uPermissions,
         status: 'active'
@@ -834,7 +837,7 @@ export default function UnifiedDashboard({
       setUsers(prev => [...prev, newUser]);
     }
 
-    setUEmail('');
+    setUEmail(''); setUPassword('');
     setShowUserForm(false);
   };
 
@@ -2751,7 +2754,7 @@ export default function UnifiedDashboard({
                     <span>{editingUserId ? (lang === 'ar' ? 'تعديل صلاحيات الحساب' : 'Edit Account Permissions') : (lang === 'ar' ? 'إنشاء حساب جديد وتوزيع صلاحيات المنصة' : 'Create New Account & Allocate Rights')}</span>
                   </h4>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-2">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-[10px] font-bold text-slate-500">{lang === 'ar' ? 'البريد الإلكتروني للحساب' : 'Account Email'}</label>
                       <input 
@@ -2760,6 +2763,17 @@ export default function UnifiedDashboard({
                         value={uEmail}
                         onChange={(e) => setUEmail(e.target.value)}
                         placeholder="example@sehhati.plus"
+                        className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 font-sans"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-[10px] font-bold text-slate-500">{lang === 'ar' ? 'كلمة المرور' : 'Password'}</label>
+                      <input 
+                        type="text"
+                        value={uPassword}
+                        onChange={(e) => setUPassword(e.target.value)}
+                        placeholder={lang === 'ar' ? 'sehhati2026 (افتراضي)' : 'sehhati2026 (default)'}
                         className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 font-sans"
                       />
                     </div>

@@ -133,6 +133,7 @@ export interface SchoolEntity {
 export interface UserAccount {
   id: string;
   email: string;
+  password?: string;
   role: 'hospital' | 'school' | 'student' | 'admin';
   permissions: 'read' | 'edit' | 'manage';
   status: 'active' | 'suspended';

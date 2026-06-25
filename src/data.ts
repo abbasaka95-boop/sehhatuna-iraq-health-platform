@@ -50,12 +50,12 @@ export const initialSchools: SchoolEntity[] = [
 ];
 
 export const initialUsers: UserAccount[] = [
-  { id: 'USR-001', email: 'admin@sehhati.plus', role: 'admin', permissions: 'manage', status: 'active' },
-  { id: 'USR-002', email: 'sayyab.school@sehhati.plus', role: 'school', permissions: 'edit', status: 'active' },
-  { id: 'USR-003', email: 'farahidi.school@sehhati.plus', role: 'school', permissions: 'edit', status: 'active' },
-  { id: 'USR-004', email: 'saadi.hospital@sehhati.plus', role: 'hospital', permissions: 'edit', status: 'active' },
-  { id: 'USR-005', email: 'moussawi.hospital@sehhati.plus', role: 'hospital', permissions: 'edit', status: 'active' },
-  { id: 'USR-006', email: 'student.ahmed@sehhati.plus', role: 'student', permissions: 'read', status: 'active' }
+  { id: 'USR-001', email: 'admin@sehhati.plus', password: 'sehhati2026', role: 'admin', permissions: 'manage', status: 'active' },
+  { id: 'USR-002', email: 'sayyab.school@sehhati.plus', password: 'sehhati2026', role: 'school', permissions: 'edit', status: 'active' },
+  { id: 'USR-003', email: 'farahidi.school@sehhati.plus', password: 'sehhati2026', role: 'school', permissions: 'edit', status: 'active' },
+  { id: 'USR-004', email: 'saadi.hospital@sehhati.plus', password: 'sehhati2026', role: 'hospital', permissions: 'edit', status: 'active' },
+  { id: 'USR-005', email: 'moussawi.hospital@sehhati.plus', password: 'sehhati2026', role: 'hospital', permissions: 'edit', status: 'active' },
+  { id: 'USR-006', email: 'student.ahmed@sehhati.plus', password: 'sehhati2026', role: 'student', permissions: 'read', status: 'active' }
 ];
 
 export const initialStudents: Student[] = [

@@ -47,9 +47,8 @@ export default function App() {
   const [users, setUsers] = useState<UserAccount[]>([]);
 
   useEffect(() => {
-    // Check if we need to seed the database
     const seedFirebase = async () => {
-      if (localStorage.getItem('seeded_firebase_v1') === 'true') return;
+      if (localStorage.getItem('_db_students')) return;
       try {
         const batch = writeBatch(db);
         initialStudents.forEach(item => batch.set(doc(db, 'students', item.id), item));
@@ -61,7 +60,6 @@ export default function App() {
         initialSchools.forEach(item => batch.set(doc(db, 'schools', item.id), item));
         initialUsers.forEach(item => batch.set(doc(db, 'users', item.id), item));
         await batch.commit();
-        localStorage.setItem('seeded_firebase_v1', 'true');
       } catch (err) {
         console.error("Seeding error:", err);
       }
