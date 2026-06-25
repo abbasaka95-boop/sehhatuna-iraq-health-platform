@@ -1,0 +1,8 @@
+{
+  "name": "Sehhatuna Iraq Health Platform",
+  "description": "منصة صحتنا الذكية للصحة المدرسية - نظام متكامل ليربط الطلبة والمدارس والمستشفيات مثل السعدي والموسوي لإدارة الملفات الصحية والمواعيد",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
