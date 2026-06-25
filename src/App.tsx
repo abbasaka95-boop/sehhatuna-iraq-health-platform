@@ -47,66 +47,71 @@ export default function App() {
   const [users, setUsers] = useState<UserAccount[]>([]);
 
   useEffect(() => {
-    const seedFirebase = async () => {
-      if (localStorage.getItem('_db_students')) return;
-      try {
-        const batch = writeBatch(db);
-        initialStudents.forEach(item => batch.set(doc(db, 'students', item.id), item));
-        initialAppointments.forEach(item => batch.set(doc(db, 'appointments', item.id), item));
-        initialReports.forEach(item => batch.set(doc(db, 'reports', item.id), item));
-        initialEmergencies.forEach(item => batch.set(doc(db, 'emergencies', item.id), item));
-        initialAnnouncements.forEach(item => batch.set(doc(db, 'announcements', item.id), item));
-        initialHospitals.forEach(item => batch.set(doc(db, 'hospitals', item.id), item));
-        initialSchools.forEach(item => batch.set(doc(db, 'schools', item.id), item));
-        initialUsers.forEach(item => batch.set(doc(db, 'users', item.id), item));
-        await batch.commit();
-      } catch (err) {
-        console.error("Seeding error:", err);
+    let cancelled = false;
+    const init = async () => {
+      // 1. Seed data FIRST (wait for it)
+      if (!localStorage.getItem('_db_students')) {
+        try {
+          const batch = writeBatch(db);
+          initialStudents.forEach(item => batch.set(doc(db, 'students', item.id), item));
+          initialAppointments.forEach(item => batch.set(doc(db, 'appointments', item.id), item));
+          initialReports.forEach(item => batch.set(doc(db, 'reports', item.id), item));
+          initialEmergencies.forEach(item => batch.set(doc(db, 'emergencies', item.id), item));
+          initialAnnouncements.forEach(item => batch.set(doc(db, 'announcements', item.id), item));
+          initialHospitals.forEach(item => batch.set(doc(db, 'hospitals', item.id), item));
+          initialSchools.forEach(item => batch.set(doc(db, 'schools', item.id), item));
+          initialUsers.forEach(item => batch.set(doc(db, 'users', item.id), item));
+          await batch.commit();
+        } catch (err) {
+          console.error("Seeding error:", err);
+        }
       }
+
+      if (cancelled) return;
+
+      // 2. Subscribe to changes AFTER seed
+      const unsubApps = onSnapshot(collection(db, 'appointments'), (snapshot) => {
+        setAppointments(snapshot.docs.map(doc => doc.data() as Appointment));
+      }, (err) => console.error("Firebase error appointments:", err));
+
+      const unsubEmgs = onSnapshot(collection(db, 'emergencies'), (snapshot) => {
+        setEmergencies(snapshot.docs.map(doc => doc.data() as EmergencyAlert));
+      }, (err) => console.error("Firebase error emergencies:", err));
+
+      const unsubReps = onSnapshot(collection(db, 'reports'), (snapshot) => {
+        setReports(snapshot.docs.map(doc => doc.data() as HealthReport));
+      }, (err) => console.error("Firebase error reports:", err));
+
+      const unsubStudents = onSnapshot(collection(db, 'students'), (snapshot) => {
+        setStudents(snapshot.docs.map(doc => doc.data() as Student));
+      }, (err) => console.error("Firebase error students:", err));
+
+      const unsubAnnouncements = onSnapshot(collection(db, 'announcements'), (snapshot) => {
+        setAnnouncements(snapshot.docs.map(doc => doc.data() as AnnouncementAlert));
+      }, (err) => console.error("Firebase error announcements:", err));
+
+      const unsubHospitals = onSnapshot(collection(db, 'hospitals'), (snapshot) => {
+        setHospitals(snapshot.docs.map(doc => doc.data() as HospitalEntity));
+      }, (err) => console.error("Firebase error hospitals:", err));
+
+      const unsubSchools = onSnapshot(collection(db, 'schools'), (snapshot) => {
+        setSchools(snapshot.docs.map(doc => doc.data() as SchoolEntity));
+      }, (err) => console.error("Firebase error schools:", err));
+
+      const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+        setUsers(snapshot.docs.map(doc => doc.data() as UserAccount));
+      }, (err) => console.error("Firebase error users:", err));
+
+      // Store unsubs for cleanup
+      unsubs.push(unsubApps, unsubEmgs, unsubReps, unsubStudents, unsubAnnouncements, unsubHospitals, unsubSchools, unsubUsers);
     };
-    seedFirebase();
 
-    const unsubApps = onSnapshot(collection(db, 'appointments'), (snapshot) => {
-      setAppointments(snapshot.docs.map(doc => doc.data() as Appointment));
-    }, (err) => console.error("Firebase error appointments:", err));
-
-    const unsubEmgs = onSnapshot(collection(db, 'emergencies'), (snapshot) => {
-      setEmergencies(snapshot.docs.map(doc => doc.data() as EmergencyAlert));
-    }, (err) => console.error("Firebase error emergencies:", err));
-
-    const unsubReps = onSnapshot(collection(db, 'reports'), (snapshot) => {
-      setReports(snapshot.docs.map(doc => doc.data() as HealthReport));
-    }, (err) => console.error("Firebase error reports:", err));
-
-    const unsubStudents = onSnapshot(collection(db, 'students'), (snapshot) => {
-      setStudents(snapshot.docs.map(doc => doc.data() as Student));
-    }, (err) => console.error("Firebase error students:", err));
-
-    const unsubAnnouncements = onSnapshot(collection(db, 'announcements'), (snapshot) => {
-      setAnnouncements(snapshot.docs.map(doc => doc.data() as AnnouncementAlert));
-    }, (err) => console.error("Firebase error announcements:", err));
-
-    const unsubHospitals = onSnapshot(collection(db, 'hospitals'), (snapshot) => {
-      setHospitals(snapshot.docs.map(doc => doc.data() as HospitalEntity));
-    }, (err) => console.error("Firebase error hospitals:", err));
-
-    const unsubSchools = onSnapshot(collection(db, 'schools'), (snapshot) => {
-      setSchools(snapshot.docs.map(doc => doc.data() as SchoolEntity));
-    }, (err) => console.error("Firebase error schools:", err));
-
-    const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
-      setUsers(snapshot.docs.map(doc => doc.data() as UserAccount));
-    }, (err) => console.error("Firebase error users:", err));
+    const unsubs: (() => void)[] = [];
+    init();
 
     return () => {
-      unsubApps();
-      unsubEmgs();
-      unsubReps();
-      unsubStudents();
-      unsubAnnouncements();
-      unsubHospitals();
-      unsubSchools();
-      unsubUsers();
+      cancelled = true;
+      unsubs.forEach(fn => fn());
     };
   }, []);
 
