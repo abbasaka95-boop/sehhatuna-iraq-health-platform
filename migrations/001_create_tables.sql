@@ -1,0 +1,91 @@
+CREATE TABLE IF NOT EXISTS students (
+  id TEXT PRIMARY KEY,
+  nameAr TEXT NOT NULL DEFAULT '',
+  nameEn TEXT NOT NULL DEFAULT '',
+  grade TEXT NOT NULL DEFAULT '',
+  schoolId TEXT NOT NULL DEFAULT '',
+  guardianEmail TEXT NOT NULL DEFAULT '',
+  guardianName TEXT NOT NULL DEFAULT '',
+  emergencyContact TEXT NOT NULL DEFAULT '',
+  bloodType TEXT NOT NULL DEFAULT '',
+  allergies TEXT NOT NULL DEFAULT '',
+  chronicDiseases TEXT NOT NULL DEFAULT '',
+  vaccineStatus TEXT NOT NULL DEFAULT '',
+  lastCheckupDate TEXT NOT NULL DEFAULT '',
+  qrCode TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS schools (
+  id TEXT PRIMARY KEY,
+  nameAr TEXT NOT NULL DEFAULT '',
+  nameEn TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
+  address TEXT NOT NULL DEFAULT '',
+  phone TEXT NOT NULL DEFAULT '',
+  password TEXT NOT NULL DEFAULT 'sehhati2026'
+);
+
+CREATE TABLE IF NOT EXISTS hospitals (
+  id TEXT PRIMARY KEY,
+  nameAr TEXT NOT NULL DEFAULT '',
+  nameEn TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
+  address TEXT NOT NULL DEFAULT '',
+  phone TEXT NOT NULL DEFAULT '',
+  password TEXT NOT NULL DEFAULT 'sehhati2026'
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL DEFAULT '',
+  password TEXT NOT NULL DEFAULT 'sehhati2026',
+  role TEXT NOT NULL DEFAULT '',
+  nameAr TEXT NOT NULL DEFAULT '',
+  nameEn TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS appointments (
+  id TEXT PRIMARY KEY,
+  studentId TEXT NOT NULL DEFAULT '',
+  hospitalId TEXT NOT NULL DEFAULT '',
+  date TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  createdAt TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS reports (
+  id TEXT PRIMARY KEY,
+  studentId TEXT NOT NULL DEFAULT '',
+  hospitalId TEXT NOT NULL DEFAULT '',
+  date TEXT NOT NULL DEFAULT '',
+  type TEXT NOT NULL DEFAULT '',
+  result TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  doctorName TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS emergencies (
+  id TEXT PRIMARY KEY,
+  studentId TEXT NOT NULL DEFAULT '',
+  studentName TEXT NOT NULL DEFAULT '',
+  studentGrade TEXT NOT NULL DEFAULT '',
+  guardianPhone TEXT NOT NULL DEFAULT '',
+  location TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'active',
+  timestamp TEXT NOT NULL DEFAULT '',
+  hospitalId TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS announcements (
+  id TEXT PRIMARY KEY,
+  schoolId TEXT NOT NULL DEFAULT '',
+  titleAr TEXT NOT NULL DEFAULT '',
+  titleEn TEXT NOT NULL DEFAULT '',
+  contentAr TEXT NOT NULL DEFAULT '',
+  contentEn TEXT NOT NULL DEFAULT '',
+  date TEXT NOT NULL DEFAULT '',
+  type TEXT NOT NULL DEFAULT '',
+  targetRole TEXT NOT NULL DEFAULT 'all'
+);
