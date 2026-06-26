@@ -11,7 +11,7 @@ const TABLE_COLUMNS: Record<string, string[]> = {
   students: ['id','nameAr','nameEn','grade','schoolId','guardianEmail','guardianName','emergencyContact','bloodType','allergies','chronicDiseases','vaccineStatus','lastCheckupDate','qrCode'],
   schools: ['id','nameAr','nameEn','email','address','phone','password'],
   hospitals: ['id','nameAr','nameEn','email','address','phone','password'],
-  users: ['id','email','password','role','nameAr','nameEn'],
+  app_users: ['id','email','password','role','nameAr','nameEn'],
   appointments: ['id','studentId','hospitalId','date','status','description','createdAt'],
   reports: ['id','studentId','hospitalId','date','type','result','notes','doctorName'],
   emergencies: ['id','studentId','studentName','studentGrade','guardianPhone','location','description','status','timestamp','hospitalId'],

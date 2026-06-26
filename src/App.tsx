@@ -66,7 +66,7 @@ export default function App() {
           initialAnnouncements.forEach(item => batch.set(doc(db, 'announcements', item.id), { ...item }));
           initialHospitals.forEach(item => batch.set(doc(db, 'hospitals', item.id), { ...item }));
           initialSchools.forEach(item => batch.set(doc(db, 'schools', item.id), { ...item }));
-          initialUsers.forEach(item => batch.set(doc(db, 'users', item.id), { ...item }));
+          initialUsers.forEach(item => batch.set(doc(db, 'app_users', item.id), { ...item }));
           await batch.commit();
         } catch (err) {
           console.error("Seeding error:", err);
@@ -104,7 +104,7 @@ export default function App() {
         setSchools(snapshot.docs.map(doc => doc.data() as SchoolEntity));
       }, (err) => console.error("Firebase error schools:", err));
 
-      const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
+      const unsubUsers = onSnapshot(collection(db, 'app_users'), (snapshot) => {
         setUsers(snapshot.docs.map(doc => doc.data() as UserAccount));
       }, (err) => console.error("Firebase error users:", err));
 

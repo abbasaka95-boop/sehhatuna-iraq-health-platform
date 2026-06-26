@@ -121,7 +121,7 @@ export default function UnifiedDashboard({
 
   // Sub Tabs for entities or user listings
   const [entitySubTab, setEntitySubTab] = useState<'schools' | 'hospitals'>('schools');
-  const [userSubTab, setUserSubTab] = useState<'students' | 'users'>('students');
+  const [userSubTab, setUserSubTab] = useState<'students' | 'app_users'>('students');
 
   // 2. Forms Toggles & Dynamic inputs
   // Hospital Form State
@@ -811,7 +811,7 @@ export default function UnifiedDashboard({
       if (uPassword) updated.password = uPassword;
 
       try {
-        await setDoc(doc(db, 'users', editingUserId), updated, { merge: true });
+        await setDoc(doc(db, 'app_users', editingUserId), updated, { merge: true });
       } catch (err) {
         console.error("Error updating user:", err);
       }
@@ -829,7 +829,7 @@ export default function UnifiedDashboard({
       };
 
       try {
-        await setDoc(doc(db, 'users', newUser.id), newUser);
+        await setDoc(doc(db, 'app_users', newUser.id), newUser);
       } catch (err) {
         console.error("Error adding user:", err);
       }
@@ -851,7 +851,7 @@ export default function UnifiedDashboard({
 
   const handleDeleteUser = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'users', id));
+      await deleteDoc(doc(db, 'app_users', id));
     } catch (err) {
       console.error("Error deleting user:", err);
     }
@@ -864,7 +864,7 @@ export default function UnifiedDashboard({
     const nextStatus = target.status === 'active' ? 'suspended' : 'active';
 
     try {
-      await setDoc(doc(db, 'users', id), { status: nextStatus }, { merge: true });
+      await setDoc(doc(db, 'app_users', id), { status: nextStatus }, { merge: true });
     } catch (err) {
       console.error("Error toggling user status:", err);
     }
@@ -2423,9 +2423,9 @@ export default function UnifiedDashboard({
               </button>
 
               <button 
-                onClick={() => setUserSubTab('users')}
+                onClick={() => setUserSubTab('app_users')}
                 className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                  userSubTab === 'users' 
+userSubTab === 'app_users'
                     ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
                     : 'text-slate-500 hover:text-slate-900'
                 }`}
@@ -2738,7 +2738,7 @@ export default function UnifiedDashboard({
           )}
 
           {/* SUBTAB 2: ACCESS CONTROL & PERMISSIONS */}
-          {userSubTab === 'users' && (
+          {userSubTab === 'app_users' && (
             <div className="flex flex-col gap-6">
               
               {/* Account Form */}

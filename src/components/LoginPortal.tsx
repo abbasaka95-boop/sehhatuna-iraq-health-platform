@@ -81,7 +81,7 @@ export default function LoginPortal({ onLoginSuccess, lang }: LoginPortalProps) 
 
     // Check Nhost for custom users (created via admin panel)
     try {
-      const userSnap = await getDocs(collection(db, 'users'));
+      const userSnap = await getDocs(collection(db, 'app_users'));
       const matched = userSnap.docs.map((d: any) => d.data()).find((u: any) => u.email === emailTrimmed && u.password === password);
       if (matched) {
         onLoginSuccess(matched.role || selectedRoleType, emailTrimmed);
